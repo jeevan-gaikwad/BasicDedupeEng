@@ -24,6 +24,7 @@ struct Data {
 	long long  length; //length of the actual data.
 	size_t offset; //offset in file
 
+	Data();
 	Data(long long buffLength);
 	Data(size_t offset, long long buffLength);
 	void allocateBuffer(long long buflen);

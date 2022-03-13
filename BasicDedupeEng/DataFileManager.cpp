@@ -3,7 +3,7 @@
 #include "Logging.h"
 #include "FileInterfaces.h"
 
-void DataFileManager::createOrOpenDataFile(const std::string& filename) {
+void DataFilesManager::createOrOpenDataFile(const std::string& filename) {
 
 	if (filename.empty()) {
 		logmsg(ERROR, "Empty filename received to function " << __func__);
@@ -20,12 +20,12 @@ void DataFileManager::createOrOpenDataFile(const std::string& filename) {
 	logmsg(DEBUG, "Output data file " << dataFilename << " opened successfully");
 
 }
-std::string DataFileManager::getDataFilename(const std::string filename) {
+std::string DataFilesManager::getDataFilename(const std::string filename) {
 
 	UNUSED_ARG(filename);
 	return "data_files\\data1"; //For now. Make it dynamic later
 }
-void DataFileManager::appendDataBlock(const Data& dataBlock) {
+void DataFilesManager::appendDataBlock(const Data& dataBlock) {
 	if (!outputDataFileStrm_m.is_open()) {
 		throw FileIOException(STR("File" << filename_m << " is not open/created"));
 	}
@@ -39,13 +39,13 @@ void DataFileManager::appendDataBlock(const Data& dataBlock) {
 	//outputDataFileStrm_m.flush();
 }
 
-DataFileManager::~DataFileManager() {
+DataFilesManager::~DataFilesManager() {
 	if (outputDataFileStrm_m.is_open()) {
 		outputDataFileStrm_m.close();
 	}
 }
 
-DataFileManager::DataFileManager(const std::string filename, std::ios_base::openmode fileOpenMode): filename_m(filename) {
+DataFilesManager::DataFilesManager(const std::string filename, std::ios_base::openmode fileOpenMode): filename_m(filename) {
 	if (filename.empty()) {
 		throw std::invalid_argument("Empty filename received");
 	}
@@ -76,7 +76,8 @@ DataFileManager::DataFileManager(const std::string filename, std::ios_base::open
 /// This function throws FileIOException in case of failures
 /// </summary>
 /// <param name="dataBlock"></param>
-void DataFileManager::readDataBlock(const Data& dataBlock) {
+void DataFilesManager::readDataBlock(DedupedDataInfo dedupeDataBlockInfo, 
+	const Data& dataBlock) {
 	if (dataBlock.length == 0) {
 		return; //nothing to do
 	}

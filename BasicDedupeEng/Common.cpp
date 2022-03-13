@@ -11,12 +11,18 @@ std::string getCurrentTimeAsString() {
 	localtime_s(&timeInfo, &currTime);
 	return (std::ostringstream() << std::put_time(&timeInfo, "%d-%m-%Y %H:%M:%S")).str();
 }
+
 Data::Data(size_t offset, long long buffLength):offset(offset), length(buffLength) {
 	allocateBuffer(buffLength);
 }
 Data::Data(long long buffLength) {
 	allocateBuffer(buffLength);
 }
+
+Data::Data() {
+	allocateBuffer(BUFF_SIZE);
+}
+
 Data::~Data() {
 	if (buff != nullptr) {
 		delete buff;

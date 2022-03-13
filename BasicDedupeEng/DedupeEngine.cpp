@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <openssl/sha.h>
 #include <cstdio>
-#include <filesystem>
+#include <filesystem> //new C++17
 #include <fstream>
 #include "IndexFileManager.h"
 #include "Logging.h"
@@ -22,7 +22,7 @@ status_t DedupeEngine::dedupeFile(const std::string& filename) {
 	try {
 		IndexFileManager indFlMgr(filename, std::ios_base::app);
 		logmsg(DEBUG, "Created index file for file " << filename);
-		DataFileManager dataFlMgr(filename, std::ios_base::out);
+		DataFilesManager dataFlMgr(filename, std::ios_base::out);
 		logmsg(DEBUG, "Created data file for file " << filename);
 
 
@@ -111,15 +111,15 @@ status_t DedupeEngine::createFileFromEngine(const std::string& filename) {
 
 		/* 2. Now we need to read index file records and build the actual file*/
 		IndexFileManager indFlMgr(filename, std::ios_base::in);
-		DataFileManager dataFlMgr(filename, std::ios_base::in); //open file for reading
+		//DataFileManager dataFlMgr(filename, std::ios_base::in); //open file for reading
 		DedupedDataInfo dedupeDataBlockInfo;
 
 		std::ofstream outputFile(filename + "_recovered", std::ios_base::binary);
 
 		/* 3. Now read the data block by block from the data file at offset and length*/
+		Data dataBlock;
 		while (indFlMgr.readNextIndexFileRecord(dedupeDataBlockInfo) != FILE_EOF_REACHED) {
-			Data dataBlock(dedupeDataBlockInfo.offset, dedupeDataBlockInfo.length);
-			dataFlMgr.readDataBlock(dataBlock);
+			dataFlMgr.readDataBlock(dedupeDataBlockInfo, dataBlock);
 			//now append this data block to output file
 			outputFile.write(dataBlock.buff, dataBlock.length);
 		}
@@ -144,4 +144,19 @@ std::string DedupeEngine::createFileMetaDirIfNotExists(const std::string& filena
 }
 
 
+void DedupeEngine::openAllDataFiles(const std::string& dataFileDir) {
+	if (dataFileDir.empty()) {
+		throw std::invalid_argument("Empty data file dir name received");
+	}
+	logmsg(DEBUG, "Opening data file dir " << dataFileDir);
+	std::filesystem::path dirPath{ dataFileDir };
+	for (std::filesystem::directory_entry dataFileEntry : std::filesystem::directory_iterator(dirPath)) {
+		if (dataFileEntry.is_regular_file()) {
+			//insert into out filename & file if stream map
+			dataFilenameMap[dataFileEntry.path().stem().string()] = std::ifstream{ dataFileEntry.path(), std::ios_base::binary}; //open file at run time and put into the map
+			logmsg(DEBUG, "Opened and inserted " << dataFileEntry);
+		}
+	}
+	logmsg(DEBUG, "Done " << __func__);
 
+}
