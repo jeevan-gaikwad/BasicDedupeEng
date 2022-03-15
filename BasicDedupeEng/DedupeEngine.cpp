@@ -144,19 +144,3 @@ std::string DedupeEngine::createFileMetaDirIfNotExists(const std::string& filena
 }
 
 
-void DedupeEngine::openAllDataFiles(const std::string& dataFileDir) {
-	if (dataFileDir.empty()) {
-		throw std::invalid_argument("Empty data file dir name received");
-	}
-	logmsg(DEBUG, "Opening data file dir " << dataFileDir);
-	std::filesystem::path dirPath{ dataFileDir };
-	for (std::filesystem::directory_entry dataFileEntry : std::filesystem::directory_iterator(dirPath)) {
-		if (dataFileEntry.is_regular_file()) {
-			//insert into out filename & file if stream map
-			dataFilenameMap[dataFileEntry.path().stem().string()] = std::ifstream{ dataFileEntry.path(), std::ios_base::binary}; //open file at run time and put into the map
-			logmsg(DEBUG, "Opened and inserted " << dataFileEntry);
-		}
-	}
-	logmsg(DEBUG, "Done " << __func__);
-
-}

@@ -7,9 +7,9 @@ class DataFilesManager
 {
 
 public:
-	void createOrOpenDataFile(const std::string& fileName);
+	//void createOrOpenDataFile(const std::string& fileName);
 	void appendDataBlock(const Data& dataBlock);
-	void readDataBlock(const Data& dataBlock);
+	void readDataBlock(const DedupedDataInfo& dedupeInfo, const Data& dataBlock);
 
 	//std::string getDataFilename(const std::string filename);
 	//DataFilesManager(const std::string filename, std::ios_base::openmode fileOpenMode);
@@ -19,8 +19,8 @@ private:
 	
 	void openAllDataFiles(const std::string& datafileDir);
 
-	std::ofstream outputDataFileStrm_m;
-	std::string filename_m;
+	std::ofstream currentOutputDataFile_strm;
+	std::string currentDatafileOutputFilename_m;
 	//std::ifstream dataFileInputStrm_m;
 
 	std::unordered_map<std::string, std::ifstream> dataFilenameMap; // data file name and opened data file to read
