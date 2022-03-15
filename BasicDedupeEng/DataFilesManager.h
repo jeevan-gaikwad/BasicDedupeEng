@@ -3,6 +3,8 @@
 #include <fstream>
 #include <unordered_map>
 
+const size_t DATA_FILE_SIZE_LIMIT = 16 * 1048576;//16MB
+
 class DataFilesManager
 {
 
@@ -19,10 +21,12 @@ private:
 	
 	void openAllDataFiles(const std::string& datafileDir);
 
+	size_t getDataFileSizeLimit();
+
 	std::ofstream currentOutputDataFile_strm;
 	std::string currentDatafileOutputFilename_m;
 	//std::ifstream dataFileInputStrm_m;
 
 	std::unordered_map<std::string, std::ifstream> dataFilenameMap; // data file name and opened data file to read
-	const std::string dataFilesDir = "data_files"; //relative path
+	const std::string dataFilesDir_m = "data_files"; //relative path
 };

@@ -25,10 +25,21 @@
 //	UNUSED_ARG(filename);
 //	return "data_files\\data1"; //For now. Make it dynamic later
 //}
-
+DataFilesManager::DataFilesManager() {
+	openAllDataFiles(dataFilesDir_m);
+}
 void DataFilesManager::appendDataBlock(const Data& dataBlock) {
-	if (!currentOutputDataFile_strm.is_open()) {
-		throw FileIOException(STR("File" << currentDatafileOutputFilename_m << " is not open/created"));
+	
+	//check if the current data file is opened or max data file size limit is reached
+	if (!currentOutputDataFile_strm.is_open() || currentOutputDataFile_strm.tellp() >= getDataFileSizeLimit()) {
+		//close the current file and create new one
+		currentOutputDataFile_strm.close();
+		auto newFilename = "" + std::atoi(currentDatafileOutputFilename_m.c_str()) + 1;
+		currentOutputDataFile_strm.open(newFilename, std::ios_base::binary);
+		if (!currentOutputDataFile_strm.is_open()) {
+			throw FileIOException(STR("Failed to open/create data file " << newFilename));
+		}
+		dataFilenameMap.emplace(newFilename, currentOutputDataFile_strm);
 	}
 	//write raw
 	currentOutputDataFile_strm.write(dataBlock.buff, dataBlock.length);
@@ -120,13 +131,21 @@ void DataFilesManager::openAllDataFiles(const std::string& dataFileDir) {
 	}
 	logmsg(DEBUG, "Opening data file dir " << dataFileDir);
 	std::filesystem::path dirPath{ dataFileDir };
+	std::string lastOpenedFilename;
 	for (std::filesystem::directory_entry dataFileEntry : std::filesystem::directory_iterator(dirPath)) {
 		if (dataFileEntry.is_regular_file()) {
 			//insert into out filename & file if stream map
-			dataFilenameMap[dataFileEntry.path().stem().string()] = std::ifstream{ dataFileEntry.path(), std::ios_base::binary }; //open file at run time and put into the map
+			lastOpenedFilename = dataFileEntry.path().stem().string();
+			dataFilenameMap[lastOpenedFilename] = std::ifstream{ dataFileEntry.path(), std::ios_base::binary }; //open file at run time and put into the map
 			logmsg(DEBUG, "Opened and inserted " << dataFileEntry);
 		}
 	}
+	currentDatafileOutputFilename_m = lastOpenedFilename;
 	logmsg(DEBUG, "Done " << __func__);
 
+}
+
+size_t DataFilesManager::getDataFileSizeLimit()
+{
+	return DATA_FILE_SIZE_LIMIT;
 }
