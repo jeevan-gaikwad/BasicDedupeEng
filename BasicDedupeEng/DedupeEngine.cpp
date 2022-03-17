@@ -34,9 +34,9 @@ status_t DedupeEngine::dedupeFile(const std::string& filename) {
 					std::cout << "This block is already present" << std::endl;
 				}
 				else {
+					//update index file and data file for the same & update dudupe meta data with data file offset
+					dataFilesManager_m.appendDataBlock(dataBuff, dedupeMetaData);
 					map.insert({ dedupeMetaData.fingerprint, dedupeMetaData }); //insert a pair
-					//update index file and data file for the same
-					dedupeMetaData.dataFileName = dataFilesManager_m.appendDataBlock(dataBuff);
 				}
 				//always update the index file to track block info for the file
 				indFlMgr.appendFileMetaData(dedupeMetaData);
@@ -116,7 +116,8 @@ status_t DedupeEngine::createFileFromEngine(const std::string& filename) {
 		Data dataBlock;
 		while (indFlMgr.readNextIndexFileRecord(dedupeDataBlockInfo) != FILE_EOF_REACHED) {
 			dataFilesManager_m.readDataBlock(dedupeDataBlockInfo, dataBlock);
-			//now append this data block to output file
+			//now append this data block to output file at the right offset
+			outputFile.seekp(dedupeDataBlockInfo.offset, std::ofstream::beg);
 			outputFile.write(dataBlock.buff, dataBlock.length);
 		}
 		outputFile.close();

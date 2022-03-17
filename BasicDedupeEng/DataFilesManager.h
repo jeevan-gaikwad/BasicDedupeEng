@@ -12,7 +12,7 @@ class DataFilesManager
 {
 
 public:
-	std::string appendDataBlock(const Data& dataBlock);
+	std::string appendDataBlock(const Data& dataBlock, DedupedDataInfo& dedupeInfoOut);
 	void readDataBlock(const DedupedDataInfo& dedupeInfo, Data& dataBlockOut);
 
 	/* Constuctor will open all existing data files one by one and populate the map*/

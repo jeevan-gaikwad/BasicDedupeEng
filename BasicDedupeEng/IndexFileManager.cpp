@@ -60,13 +60,10 @@ void IndexFileManager::appendFileMetaData(const DedupedDataInfo& dedupeDataInfo)
 	if (!indexFileOutStrm_m.is_open()) {
 		throw FileIOException(STR("File" << indFilename_m << " is not open/created"));
 	}
-	//write raw
-	indexFileOutStrm_m << dedupeDataInfo.fingerprint<<std::endl << dedupeDataInfo.dataFileName << std::endl << dedupeDataInfo.offset << std::endl << dedupeDataInfo.length << std::endl;
+	//write raw. std::endl is a record separator here
+	indexFileOutStrm_m << dedupeDataInfo.fingerprint<<std::endl << dedupeDataInfo.offset << std::endl << dedupeDataInfo.length << std::endl <<
+		dedupeDataInfo.dataFileName <<std::endl << dedupeDataInfo.dataFileOffset<< std::endl;
 	
-	/*indexFileOutStrm_m.write(dedupeDataInfo.fingerprint.c_str(), strlen(dedupeDataInfo.fingerprint.c_str()));
-	indexFileOutStrm_m.write(dedupeDataInfo.dataFileName.c_str(), strlen(dedupeDataInfo.dataFileName.c_str()));
-	indexFileOutStrm_m.write((char*)dedupeDataInfo.offset, sizeof(DedupedDataInfo::offset));
-	indexFileOutStrm_m.write((char*)&dedupeDataInfo.length, sizeof(DedupedDataInfo::length));*/
 	if (indexFileOutStrm_m.bad()) {
 		throw FileIOException(STR("Failed to write index record to file"<< indFilename_m));
 	}
@@ -90,10 +87,9 @@ status_t IndexFileManager::readNextIndexFileRecord(DedupedDataInfo& dedupeDataIn
 		}
 		logmsg(INFO, "Successfully opened dedupe info index file " << getIndexFilename(indFilename_m));
 	}
-	localDedupeInfo.myVal = -1;
 	dedupeDataInfo.fingerprint.clear();
-	indexFileReadStrm_m >> dedupeDataInfo.fingerprint;
-	indexFileReadStrm_m >> dedupeDataInfo.dataFileName >> dedupeDataInfo.offset >> dedupeDataInfo.length;
+	indexFileReadStrm_m >> dedupeDataInfo.fingerprint >> dedupeDataInfo.offset >> dedupeDataInfo.length 
+		>> dedupeDataInfo.dataFileName >> dedupeDataInfo.dataFileOffset;
 
 	//indexFileReadStrm_m.read((char*)&localDedupeInfo, sizeof(DedupedDataInfo));
 	if (indexFileReadStrm_m.bad() && indexFileReadStrm_m.gcount() < sizeof(DedupedDataInfo)) {

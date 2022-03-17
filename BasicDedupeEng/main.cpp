@@ -30,7 +30,7 @@ int main()
 
     DedupedDataInfo dedupeData;
 
-    //eng.dedupeFile(inputFilename);
+    eng.dedupeFile(inputFilename);
     logmsg(INFO, "Deduplication is complete. now testing recovery..");
     eng.createFileFromEngine(inputFilename);
 

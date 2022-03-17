@@ -21,7 +21,7 @@ std::string DataFilesManager::generateNextFilename(const std::string& currentFil
 	}
 	auto newFilename = "" + std::atoi(currentDatafileOutputFilename_m.c_str()) + 1;
 }
-std::string DataFilesManager::appendDataBlock(const Data& dataBlock) {
+std::string DataFilesManager::appendDataBlock(const Data& dataBlock, DedupedDataInfo& dedupeInfoOut) {
 	
 	//check if the current data file is opened or max data file size limit is reached
 	if (!currentOutputDataFile_strm.is_open() || (long)currentOutputDataFile_strm.tellp() >= getDataFileSizeLimit()) {
@@ -43,15 +43,14 @@ std::string DataFilesManager::appendDataBlock(const Data& dataBlock) {
 	logmsg(DEBUG, "Continue to write to existing file " << currentDatafileOutputFilename_m);
 
 	//write raw
+	dedupeInfoOut.dataFileOffset = currentOutputDataFile_strm.tellp();
 	currentOutputDataFile_strm.write(dataBlock.buff, dataBlock.length);
 	if (currentOutputDataFile_strm.bad()) {
 		throw FileIOException(STR("Failed to write data block to data file" << currentDatafileOutputFilename_m));
 	}
+	dedupeInfoOut.dataFileName = currentDatafileOutputFilename_m;
 	logmsg(INFO, "Updated data file for record offset " << dataBlock.offset
 		<< " length " << dataBlock.length);
-	
-	//return which datafile has this data block
-	return currentDatafileOutputFilename_m;
 }
 
 DataFilesManager::~DataFilesManager() {
@@ -76,8 +75,8 @@ void DataFilesManager::readDataBlock(const DedupedDataInfo& dedupeDataBlockInfo,
 		if (!dataFilenameMap_m[filename].is_open()) { //operate on the value
 			throw FileIOException("Input data file is not open");
 		}
-		//seek to the right position
-		dataFilenameMap_m[filename].seekg(dedupeDataBlockInfo.offset, std::ios_base::beg);
+		//seek to the right position provided in dedupe block info
+		dataFilenameMap_m[filename].seekg(dedupeDataBlockInfo.dataFileOffset, std::ios_base::beg);
 		//read actual data
 		dataFilenameMap_m[filename].read(dataBlockOut.buff, dedupeDataBlockInfo.length);
 		//when we're reading at specific offset and length, we're expected to read full length else its an error

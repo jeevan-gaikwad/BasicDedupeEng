@@ -50,10 +50,10 @@ using status_t = short;
 
 struct DedupedDataInfo {
 	std::string fingerprint;
-	std::string dataFileName;
 	size_t offset;
 	long long length;
-	int myVal = 999;
+	std::string dataFileName;
+	size_t dataFileOffset;
 };
 
 class DedupeProcessingException: public std::exception
