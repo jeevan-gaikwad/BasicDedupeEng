@@ -23,19 +23,17 @@ int main()
     logmsg(INFO, "-----------------------------------------------------------------------------------");
     logmsg(INFO, "-------------------------Basic Dedupe Engine execution started---------------------");
     logmsg(INFO, "-----------------------------------------------------------------------------------");
-    std::cout << "Going to calculate fingerprint" << std::endl;
     DedupeEngine eng;
     std::cout << "Size of dedupemeta data is:" << sizeof(DedupedDataInfo) << std::endl;
-    unsigned char sampleStr[256] = { '\0' };//"Hi this is Jeevan";
-    //strcpy(sampleStr, "Hi this is Jeevan");
-    //strcpy(sampleData.buff, sampleStr);
-    //sampleData.buff = (unsigned char*)"Hi this is Jeevan";
-    //sampleData.length = strlen("Hi this is Jeevan");
+
+    const std::string inputFilename = "XP-PENWin_3.2.2.211027.zip";
+
     DedupedDataInfo dedupeData;
-    eng.dedupeFile("XP-PENWin_3.2.2.211027.zip");
-    //eng.dedupeFile("sampleInputDataSame.pdf");
+
+    //eng.dedupeFile(inputFilename);
     logmsg(INFO, "Deduplication is complete. now testing recovery..");
-    eng.createFileFromEngine("sampleInputData.pdf");
+    eng.createFileFromEngine(inputFilename);
+
     std::cout << "Done" << std::endl;
     
     /*
@@ -44,7 +42,6 @@ int main()
     logmsg(ERROR, "this is another another log msg");
     */
     //printMsg(std::ostringstream() << "Hello there");
-    int i = 10;
     //printMsg(STR2(std::ostringstream()<<"Hello my dear"<<i));
     
     /*

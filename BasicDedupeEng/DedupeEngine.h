@@ -5,6 +5,7 @@
 #include <fstream>
 #include <unordered_map>
 #include "Common.h"
+#include "DataFilesManager.h"
 
 const std::string dedupe_file_suffix =  "_dedupe";
 
@@ -21,14 +22,21 @@ public:
 	*  It creates an index files under 'index_files' dir and a data file with unique blocks
 	*/
 	status_t dedupeFile(const std::string& fileName);
+
+	/* Restore duduped file from engine using createFileFromEngine function
+	*/
 	status_t createFileFromEngine(const std::string& filename);
 	status_t calculateFingerprint(const Data& dataBuff, DedupedDataInfo& dedupeDataBuff);
-	//following 3 functions are expected to store file(s) metadata on the disk. dir/file
+
 	std::string createFileMetaDirIfNotExists(const std::string& filename);
 
 private:
-	
-	std::unordered_map<std::string, DedupedDataInfo> map; //fingerprint and associated data info
-	DataFilesManager dataFileManager;
+
+	/* Fingerprint and associated data info*/
+	std::unordered_map<std::string, DedupedDataInfo> map; 
+
+	/* Single object to manager all data files. Good candidate for singleton*/
+	DataFilesManager dataFilesManager_m;
+	const std::string outputFileSuffix_m = "_recovered";
 };
 

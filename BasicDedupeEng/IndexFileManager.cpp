@@ -78,7 +78,7 @@ std::string IndexFileManager::getIndexFilename(const std::string& filename) {
 	if (filename.empty()) {
 		throw std::invalid_argument("Empty filename received");
 	}
-	return indFilenamePrefix + filename + indFilenameSuffix;
+	return indFilenamePrefix_m + filename + indFilenameSuffix_m;
 }
 
 status_t IndexFileManager::readNextIndexFileRecord(DedupedDataInfo& dedupeDataInfo) {

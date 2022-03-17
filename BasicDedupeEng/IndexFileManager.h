@@ -18,6 +18,6 @@ private:
 	std::ofstream indexFileOutStrm_m; //for writing index records
 	std::string indFilename_m;
 	std::ifstream indexFileReadStrm_m; // for reading index file records
-	inline static const std::string indFilenamePrefix = "index_files\\";
-	inline static const std::string indFilenameSuffix = ".index";
+	inline static const std::string indFilenamePrefix_m = "index_files\\";
+	inline static const std::string indFilenameSuffix_m = ".index";
 };

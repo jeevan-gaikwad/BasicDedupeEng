@@ -7,7 +7,7 @@
 #include <fstream>
 #include "IndexFileManager.h"
 #include "Logging.h"
-#include "DataFileManager.h"
+#include "DataFilesManager.h"
 
 /*
 	Following function works with one index and one data file for each input file.
@@ -22,14 +22,10 @@ status_t DedupeEngine::dedupeFile(const std::string& filename) {
 	try {
 		IndexFileManager indFlMgr(filename, std::ios_base::app);
 		logmsg(DEBUG, "Created index file for file " << filename);
-		DataFilesManager dataFlMgr(filename, std::ios_base::out);
-		logmsg(DEBUG, "Created data file for file " << filename);
-
 
 		FileReader fileReader(filename); //read input file
 		Data dataBuff(BUFF_SIZE); //temporary buffer to read and write block of data
 		DedupedDataInfo dedupeMetaData;
-		dedupeMetaData.dataFileName = dataFlMgr.getDataFilename(filename);
 		while (!fileReader.isEof()) {
 			fileReader.readNextDataBuff(dataBuff);
 			if (calculateFingerprint(dataBuff, dedupeMetaData) == SUCCESS) {
@@ -40,7 +36,7 @@ status_t DedupeEngine::dedupeFile(const std::string& filename) {
 				else {
 					map.insert({ dedupeMetaData.fingerprint, dedupeMetaData }); //insert a pair
 					//update index file and data file for the same
-					dataFlMgr.appendDataBlock(dataBuff);
+					dedupeMetaData.dataFileName = dataFilesManager_m.appendDataBlock(dataBuff);
 				}
 				//always update the index file to track block info for the file
 				indFlMgr.appendFileMetaData(dedupeMetaData);
@@ -114,12 +110,12 @@ status_t DedupeEngine::createFileFromEngine(const std::string& filename) {
 		//DataFileManager dataFlMgr(filename, std::ios_base::in); //open file for reading
 		DedupedDataInfo dedupeDataBlockInfo;
 
-		std::ofstream outputFile(filename + "_recovered", std::ios_base::binary);
+		std::ofstream outputFile(filename + outputFileSuffix_m, std::ios_base::binary);
 
 		/* 3. Now read the data block by block from the data file at offset and length*/
 		Data dataBlock;
 		while (indFlMgr.readNextIndexFileRecord(dedupeDataBlockInfo) != FILE_EOF_REACHED) {
-			dataFlMgr.readDataBlock(dedupeDataBlockInfo, dataBlock);
+			dataFilesManager_m.readDataBlock(dedupeDataBlockInfo, dataBlock);
 			//now append this data block to output file
 			outputFile.write(dataBlock.buff, dataBlock.length);
 		}
