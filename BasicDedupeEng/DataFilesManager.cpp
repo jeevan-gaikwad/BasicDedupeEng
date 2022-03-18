@@ -19,7 +19,6 @@ std::string DataFilesManager::generateNextFilename(const std::string& currentFil
 		++currFileNum;
 		return (std::ostringstream() << currFileNum).str();
 	}
-	auto newFilename = "" + std::atoi(currentDatafileOutputFilename_m.c_str()) + 1;
 }
 std::string DataFilesManager::appendDataBlock(const Data& dataBlock, DedupedDataInfo& dedupeInfoOut) {
 	
@@ -29,7 +28,7 @@ std::string DataFilesManager::appendDataBlock(const Data& dataBlock, DedupedData
 		//close the current file and create new one
 		currentOutputDataFile_strm.close();
 
-		std::string newFilename =  generateNextFilename(currentDatafileOutputFilename_m);
+		std::string newFilename = generateNextFilename(currentDatafileOutputFilename_m);
 		std::string newFilePath = dataFilesDir_m + "\\" + newFilename;
 		currentOutputDataFile_strm.open(newFilePath, std::ios_base::binary);
 		if (!currentOutputDataFile_strm.is_open()) {
@@ -40,7 +39,7 @@ std::string DataFilesManager::appendDataBlock(const Data& dataBlock, DedupedData
 		dataFilenameMap_m.emplace(newFilename, std::ifstream(newFilename, std::ios_base::binary));
 	}
 	
-	logmsg(DEBUG, "Continue to write to existing file " << currentDatafileOutputFilename_m);
+	//logmsg(DEBUG, "Continue to write to existing file " << currentDatafileOutputFilename_m);
 
 	//write raw
 	dedupeInfoOut.dataFileOffset = currentOutputDataFile_strm.tellp();
@@ -49,8 +48,9 @@ std::string DataFilesManager::appendDataBlock(const Data& dataBlock, DedupedData
 		throw FileIOException(STR("Failed to write data block to data file" << currentDatafileOutputFilename_m));
 	}
 	dedupeInfoOut.dataFileName = currentDatafileOutputFilename_m;
-	logmsg(INFO, "Updated data file for record offset " << dataBlock.offset
-		<< " length " << dataBlock.length);
+	/*logmsg(INFO, "Updated data file for record offset " << dataBlock.offset
+		<< " length " << dataBlock.length);*/
+	return "sample";
 }
 
 DataFilesManager::~DataFilesManager() {

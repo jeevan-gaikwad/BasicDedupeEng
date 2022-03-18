@@ -27,7 +27,7 @@ class Logger {
 public:
 	Logger() {
 		currLogLevel = logLevel::INFO;
-		logFile.open(logFilename);
+		logFile.open(logFilename, std::ofstream::app);
 		if (!logFile.is_open()) {
 			//throw CommonException(STR("Failed to open" << logFilename));
 			std::cerr<<"Failed to open log file. Writing logs to stdout";
