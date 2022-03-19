@@ -36,29 +36,5 @@ int main()
 
     std::cout << "Done" << std::endl;
     
-    /*
-    logmsg(INFO, "Test log msg");
-    logmsg(DEBUG, "this is another log msg");
-    logmsg(ERROR, "this is another another log msg");
-    */
-    //printMsg(std::ostringstream() << "Hello there");
-    //printMsg(STR2(std::ostringstream()<<"Hello my dear"<<i));
-    
-    /*
-    unsigned char ibuf[] = "compute sha1";
-    unsigned char obuf[20];
-
-    SHA1(ibuf, strlen((char*)ibuf), obuf);
-
-    int i;
-    std::string output;
-    for (i = 0; i < 20; i++) {
-        char arr[10];
-        sprintf(arr, "%02x", obuf[i]);
-        output += arr;
-    }
-    std::cout << "Checksum is:" << output << std::endl;
-    printf("\n");
-    */
     logmsg(INFO, "-------------------------Basic Dedupe Engine execution end---------------------");
 }

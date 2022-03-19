@@ -111,7 +111,7 @@ public:
 		errorCode = errCode;
 	}
 
-	const char* what() {
+	const char* what() const {
 		return execeptionMsg.c_str();
 	}
 	int getErrorCode() const { return errorCode; };

@@ -48,8 +48,8 @@ status_t DedupeEngine::dedupeFile(const std::string& filename) {
 		}
 	}
 	catch (const  CommonException& e) {
-		logmsg(ERROR, "Execption occured while processing the file");
-		return UNKNOWN_ERROR;
+		logmsg(ERROR, "Execption occured while processing the file" << (e.what()));
+		return UNKNOWN_ERROR; //need to change
 	}
 	catch (const FileIOException& e) {
 		logmsg(ERROR, "FileIO exception occurrred. " << e.getErrorCode());
@@ -68,6 +68,7 @@ status_t DedupeEngine::calculateFingerprint(const Data& dataBuff, DedupedDataInf
 	dedupeDataBuff.length = dataBuff.length;
 	dedupeDataBuff.fingerprint.clear();
 	/*
+	* Another way to do it. Which SHA1 does internally.
 	int ret = SHA1_Init(&ctx);
 	if (ret == 0) {
 		std::cerr << "Failed to initialize SHA1 ctx" << std::endl;
@@ -133,8 +134,8 @@ status_t DedupeEngine::createFileFromEngine(const std::string& filename) {
 	return SUCCESS;
 }
 
+//this function is expected to check or create if not exists the directory with filename + dedupe_file_suffix
 std::string DedupeEngine::createFileMetaDirIfNotExists(const std::string& filename) {
-	//this function is expected to check or create if not exists the directory with filename + dedupe_file_suffix
 	auto fileMetaDirName = filename + dedupe_file_suffix;
 	std::filesystem::create_directory(std::filesystem::path(fileMetaDirName));
 	return fileMetaDirName;
